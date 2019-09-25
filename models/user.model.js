@@ -1,14 +1,20 @@
 const mongoose = require('mongoose');
 const config = require('../config/config');
 const bcrypt = require('bcrypt');
+// const address = require('./address.model');
 
-var userSchema = new mongoose.Schema({
+const adressSchema = new mongoose.Schema({
+    city: String,
+    street: String
+});
+
+const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, trim: true },
     username: { type: String, required: true, lowercase: true, trim: true },
     password: { type: String, required: true },
     notelp: { type: String, trim: true },
-    address: { type: String, default: 'anda belum menambahkan alamat' },
+    address: adressSchema,
     gender: String,
     bornDate: { type: Date, default: Date.now },
     loginAttemps: { type: Number, required: true, default: 0 },
@@ -17,7 +23,7 @@ var userSchema = new mongoose.Schema({
 
 // defined collection here and export module
 const User = module.exports = mongoose.model('User', userSchema)
-
+// export default User;
 module.exports.getUserById = function (id, callback) {
     console.log(id);
     User.findById(id, callback);
@@ -39,7 +45,7 @@ module.exports.addUser = function (newUser, callback) {
 }
 
 module.exports.editUser = function (user, callback) {
-    if(user) {
+    if (user) {
         user.save(callback);
     }
 }

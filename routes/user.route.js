@@ -40,7 +40,7 @@ router.post('/register', (req, res, next) => {
                 } else {
                     res.json({
                         success: true, message: 'User Register Success'
-                    })
+                    });
                 }
             })
         }
@@ -49,29 +49,19 @@ router.post('/register', (req, res, next) => {
 
 });
 
-router.post('/edit-user', (req, res, next) => {
-    let user = {
-        name: req.body.name,
-        email: req.body.email,
-        username: req.body.username,
-        password: req.body.password,
-        notelp: req.body.notelp,
-        address: req.body.address,
-        gender: req.body.gender,
-        bornDate: req.body.bornDate,
-    }
-    User.editUser(user, (err, user) => {
-        if(err) {
-            res.json({
-                success: false, message: 'Failed edit user'
-            })
+router.put('/edit/:id', (req, res, next) => {
+    User.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, user) => {
+        if (err) {
+            res.send({
+                success: false, message: 'Failed'
+            });
         } else {
-            res.json({
-                success: true, message: 'Edit user success'
+            res.send({
+                success: true, message:"Success", data: user
             })
         }
-    })
-})
+    });
+});
 
 // auth
 router.post('/authenticate', (req, res, next) => {

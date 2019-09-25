@@ -12,26 +12,45 @@ let redis = require('redis');
 let client = redis.createClient(config.port, config.host);
 let responseTime = require('response-time');
 // defined router model
+
 let usersRouter = require('./routes/user.route');
+let provinsiRouter = require('./routes/provinsi.route');
+let kotaRouter = require('./routes/kota.route');
+let kecamatanRouter = require('./routes/kecamatan.route');
+let sekolahRouter = require('./routes/sekolah.route');
 
 let app = express();
-let server = require('http').Server(app);
-let io = require('socket.io')(server);
-
+// let server = require('http').Server(app);
+// let io = require('socket.io')(server);
+// let io
 
 mongoose.Promise = global.Promise
 
+const server = require('http').createServer();
+const io = require('socket.io')(server, {
+	path: '/test',
+	serveClient: false,
+
+	pingInterval: 10000,
+	pingTimeout: 5000,
+	cookie: false
+});
+
+io.on('connect', con => {
+	console.log('on conected => ', con)
+})
+
 // configuration redis
-client.on('error', (err) => { 
+client.on('error', (err) => {
 	console.log('' + err);
 });
 
 client.on('connect', () => {
-	console.log('Redis is Ready')
+	console.log('Redis is Ready');
+	// console.log(io.);
 });
 
 client.on('message', (channel, message) => {
-	// console.log('Server idle')
 	console.log(channel);
 	console.log(message)
 })
@@ -52,16 +71,24 @@ app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 
 // setup middleware here
-app.use(logger('combined'))
+app.use(logger('dev'))
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
+
+
 // configuration url Service
 // app.use('/', indexRouter)
-app.use('/user', usersRouter)
+app.use('/user', usersRouter);
+app.use('/provinsi', provinsiRouter);
+app.use('/kota', kotaRouter);
+app.use('/kecamatan', kecamatanRouter);
+app.use('/sekolah', sekolahRouter)
+
+
 
 // Connect to mongoDB
 mongoose.connect(config.database, { useNewUrlParser: true }).then(() => console.log('MongoDB is Ready'))
